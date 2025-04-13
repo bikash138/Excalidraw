@@ -8,13 +8,12 @@ const app = express()
 
 app.use(express.json())
 
-//middleware
-
-
+//Deafault Endpoint
 app.get("/", (req,res)=>{
     res.send("Hello there!!!")
 })
 
+//Sign Un Endpoint
 app.post("/signup", async (req,res)=>{
     const parsedData = CreateUserSchema.safeParse(req.body)
     if(!parsedData.success){
@@ -43,6 +42,7 @@ app.post("/signup", async (req,res)=>{
     }
 })
 
+//Sign In Endpoint
 app.post("/signin", async (req,res)=>{
 
     const parsedData = SignInSchema.safeParse(req.body)
@@ -76,6 +76,7 @@ app.post("/signin", async (req,res)=>{
     
 })
 
+//Create Room Endpoint
 app.post("/room", middleware, async (req,res)=>{
     const parsedData = CreateRoomSchema.safeParse(req.body)
     if(!parsedData.success){
@@ -108,4 +109,23 @@ app.post("/room", middleware, async (req,res)=>{
 
 })
 
-app.listen(4000)
+app.listen(4000, ()=>{
+    console.log("You http-server is running at PORT 4000")
+})
+
+app.get("/chats/:roomId", async (req,res)=>{
+    const roomId = Number(req.params.roomId)
+    const messages = await prismaClient.chat.findMany({
+        where:{
+            roomId: roomId
+        },
+        orderBy: {
+            id: "desc"
+        },
+        take: 50
+    })
+    res.status(200).json({
+        message: "Old messages fetched",
+        messages
+    })
+})
