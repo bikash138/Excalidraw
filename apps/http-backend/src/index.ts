@@ -109,10 +109,6 @@ app.post("/room", middleware, async (req,res)=>{
 
 })
 
-app.listen(4000, ()=>{
-    console.log("You http-server is running at PORT 4000")
-})
-
 app.get("/chats/:roomId", async (req,res)=>{
     const roomId = Number(req.params.roomId)
     const messages = await prismaClient.chat.findMany({
@@ -128,4 +124,20 @@ app.get("/chats/:roomId", async (req,res)=>{
         message: "Old messages fetched",
         messages
     })
+})
+
+app.get("/room/:slug", async (req,res)=>{
+    const slug = req.params.slug
+    const room = await prismaClient.room.findFirst({
+        where:{
+            slug
+        }
+    })
+    res.status(200).json({
+        room
+    })
+})
+
+app.listen(4000, ()=>{
+    console.log("You http-server is running at PORT 4000")
 })
